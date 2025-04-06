@@ -1,0 +1,2 @@
+# magic-java
+java
