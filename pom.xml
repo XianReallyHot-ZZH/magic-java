@@ -17,6 +17,7 @@
 
     <modules>
         <module>magic01-mini-schedule</module>
+        <module>magic02-mini-thread-pool</module>
     </modules>
 
     <dependencies>
