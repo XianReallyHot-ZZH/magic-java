@@ -18,6 +18,7 @@
     <modules>
         <module>magic01-mini-schedule</module>
         <module>magic02-mini-thread-pool</module>
+        <module>magic03-pattern-decorator</module>
     </modules>
 
     <dependencies>
