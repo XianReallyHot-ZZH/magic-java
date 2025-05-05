@@ -11,9 +11,15 @@ import java.util.Map;
 @RequestMapping("/api")
 public class MyController {
 
-    @PostMapping
+    @PostMapping("/V1")
     public Map<String, Object> origin(@RequestBody Map<String, Object> json) {
+//        json.put("timestamp", System.currentTimeMillis());
         return json;
     }
 
+    @PostMapping("/V2")
+    public Map<String, Object> originEnhance(@TimestampRequestBody Map<String, Object> json) {
+//        json.put("timestamp", System.currentTimeMillis());
+        return json;
+    }
 }
