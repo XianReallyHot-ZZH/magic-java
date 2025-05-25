@@ -1,6 +1,6 @@
 package com.example.magic06patterncomposite.demo2;
 
-public class Calc {
+public class CalcDraft {
 
     public static void main(String[] args) {
         // 1+1 + 2+3
