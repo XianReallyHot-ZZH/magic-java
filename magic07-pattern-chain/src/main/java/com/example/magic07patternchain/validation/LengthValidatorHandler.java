@@ -1,7 +1,5 @@
 package com.example.magic07patternchain.validation;
 
-import com.example.magic07patternchain.exception.ValidatorException;
-
 public class LengthValidatorHandler implements ValidatorHandler {
 
     private final int length;
@@ -11,10 +9,10 @@ public class LengthValidatorHandler implements ValidatorHandler {
     }
 
     @Override
-    public void validate(Object value) {
+    public void validate(Object value, ValidatorContext context) {
         if (value instanceof String stringValue) {
-            if (stringValue.length() !=  length) {
-                throw new ValidatorException("Length is " + length + " but got " + stringValue.length());
+            if (stringValue.length() != length) {
+                context.addErrorMessage("Length is " + length + " but got " + stringValue.length());
             }
         }
     }

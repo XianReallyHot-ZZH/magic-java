@@ -6,11 +6,11 @@ import com.example.magic07patternchain.annotation.Min;
 
 public class User {
 
-    @Length(value = 4)
+    @Length(value = 3)
     private final String name;
 
     @Max(value = 120)
-    @Min(value = 1)
+    @Min(value = 20)
     private final Integer age;
 
     public User(String name, Integer age) {

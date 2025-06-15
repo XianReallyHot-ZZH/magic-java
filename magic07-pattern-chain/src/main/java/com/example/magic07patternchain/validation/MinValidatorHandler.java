@@ -1,7 +1,5 @@
 package com.example.magic07patternchain.validation;
 
-import com.example.magic07patternchain.exception.ValidatorException;
-
 public class MinValidatorHandler implements ValidatorHandler {
 
     private final int min;
@@ -11,10 +9,10 @@ public class MinValidatorHandler implements ValidatorHandler {
     }
 
     @Override
-    public void validate(Object value) {
+    public void validate(Object value, ValidatorContext context) {
         if (value instanceof Integer intValue) {
             if (intValue < min) {
-                throw new ValidatorException("Min value is " + min + " but got " + intValue);
+                context.addErrorMessage("Min value is " + min + " but got " + intValue);
             }
         }
     }

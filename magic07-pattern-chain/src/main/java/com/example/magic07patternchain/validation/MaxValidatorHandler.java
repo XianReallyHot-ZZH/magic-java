@@ -1,7 +1,5 @@
 package com.example.magic07patternchain.validation;
 
-import com.example.magic07patternchain.exception.ValidatorException;
-
 public class MaxValidatorHandler implements ValidatorHandler {
 
     private final int max;
@@ -11,12 +9,11 @@ public class MaxValidatorHandler implements ValidatorHandler {
     }
 
     @Override
-    public void validate(Object value) {
+    public void validate(Object value, ValidatorContext context) {
         if (value instanceof Integer intValue) {
             if (intValue > max) {
-                throw new ValidatorException("Max value is " + max + " but got " + intValue);
+                context.addErrorMessage("Max value is " + max + " but got " + intValue);
             }
         }
     }
-
 }

@@ -10,9 +10,11 @@ public class ValidatorChain {
     private final List<ValidatorHandler> handlers = new ArrayList<>();
 
     public void validate(Object value) throws ValidatorException {
+        ValidatorContext context = new ValidatorContext();
         for (ValidatorHandler handler : handlers) {
-            handler.validate(value);
+            handler.validate(value, context);
         }
+        context.throwExceptionIfHasError();
     }
 
 

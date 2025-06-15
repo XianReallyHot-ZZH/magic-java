@@ -4,6 +4,6 @@ import com.example.magic07patternchain.exception.ValidatorException;
 
 public interface ValidatorHandler {
 
-    void validate(Object value) throws ValidatorException;
+    void validate(Object value, ValidatorContext context);
 
 }
