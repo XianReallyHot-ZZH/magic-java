@@ -15,5 +15,8 @@ public class MaxValidatorHandler implements ValidatorHandler {
                 context.addErrorMessage("Max value is " + max + " but got " + intValue);
             }
         }
+        context.put("name", "XianReallyHot");
+        context.doNext(value);
+//        context.doNext(20);
     }
 }

@@ -10,9 +10,17 @@ public class ValidatorChain {
     private final List<ValidatorHandler> handlers = new ArrayList<>();
 
     public void validate(Object value) throws ValidatorException {
-        ValidatorContext context = new ValidatorContext();
-        for (ValidatorHandler handler : handlers) {
-            handler.validate(value, context);
+        ValidatorContext context = new ValidatorContext(value);
+        while (true) {
+            int index = context.currentIndex();
+            if (index >= handlers.size()) {
+                break;
+            }
+            handlers.get(index).validate(context.getValue(), context);
+            if (context.currentIndex() == index) {
+                // 说明没有调用doNext
+                break;
+            }
         }
         context.throwExceptionIfHasError();
     }

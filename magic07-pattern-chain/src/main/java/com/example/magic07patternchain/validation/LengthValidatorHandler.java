@@ -15,6 +15,7 @@ public class LengthValidatorHandler implements ValidatorHandler {
                 context.addErrorMessage("Length is " + length + " but got " + stringValue.length());
             }
         }
+        context.doNext(value);
     }
 
 }

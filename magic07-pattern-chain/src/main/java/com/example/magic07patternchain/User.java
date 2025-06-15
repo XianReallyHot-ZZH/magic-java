@@ -9,7 +9,7 @@ public class User {
     @Length(value = 3)
     private final String name;
 
-    @Max(value = 120)
+    @Max(value = 17)
     @Min(value = 20)
     private final Integer age;
 

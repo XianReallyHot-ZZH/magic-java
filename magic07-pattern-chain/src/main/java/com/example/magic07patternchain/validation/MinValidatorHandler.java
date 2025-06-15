@@ -10,11 +10,16 @@ public class MinValidatorHandler implements ValidatorHandler {
 
     @Override
     public void validate(Object value, ValidatorContext context) {
+        Object name = context.get("name");
+        if (name != null) {
+            System.out.println("之前由" + name + "校验过");
+        }
         if (value instanceof Integer intValue) {
             if (intValue < min) {
                 context.addErrorMessage("Min value is " + min + " but got " + intValue);
             }
         }
+        context.doNext(value);
     }
 
 }
