@@ -22,6 +22,7 @@
         <module>magic04-mini-jvm</module>
         <module>magic05-pattern-iterator</module>
         <module>magic06-pattern-composite</module>
+        <module>magic07-pattern-chain</module>
     </modules>
 
     <dependencies>
