@@ -50,6 +50,7 @@ public class BufferPool {
     public BufferPool(int totalSize, int slotSize) {
         this.totalSize = totalSize;
         this.slotSize = slotSize;
+        this.free = totalSize;
     }
 
 
