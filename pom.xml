@@ -23,6 +23,7 @@
         <module>magic05-pattern-iterator</module>
         <module>magic06-pattern-composite</module>
         <module>magic07-pattern-chain</module>
+        <module>magic08-pattern-flyweight</module>
     </modules>
 
     <dependencies>
