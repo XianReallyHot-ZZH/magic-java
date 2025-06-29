@@ -2,6 +2,7 @@ package com.example.magic09minispring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -51,7 +52,7 @@ public class ApplicationContext {
      * 1、扫描找到要造哪些对象（解决造哪些的问题）
      * 2、根据对象信息，创建对象（解决具体对象怎么造的问题）
      * （1）构造函数、入参
-     * （2）成员变量的注入
+     * （2）成员变量的自动注入
      * （3）对象生命周期函数调用
      * （4）整个初始化流程中的扩展点
      * （5）。。。
@@ -160,10 +161,15 @@ public class ApplicationContext {
         Object bean = null;
         try {
             bean = beanDefinition.getConstructor().newInstance();
+            // 实现对@PostConstruct注解的方法调用
+            Method postConstructMethod = beanDefinition.getPostConstructMethod();
+            if (postConstructMethod != null) {
+                postConstructMethod.invoke(bean);
+            }
+            ioc.put(beanDefinition.getName(), bean);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        ioc.put(beanDefinition.getName(), bean);
     }
 
 
