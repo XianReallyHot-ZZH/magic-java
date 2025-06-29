@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class ApplicationContext {
 
     private Map<String/*对象的名字*/, Object/*对象的实例*/> ioc = new HashMap<>();
+    private Map<String/*对象名字*/, BeanDefinition/*对象定义*/> beanDefinitionMap = new HashMap<>();
 
     public ApplicationContext(String packageName) throws Exception {
         initContext(packageName);
@@ -129,7 +130,13 @@ public class ApplicationContext {
      * @return
      */
     private BeanDefinition wrapperBeanDefinition(Class<?> aClass) {
-        return new BeanDefinition(aClass);
+        BeanDefinition beanDefinition = new BeanDefinition(aClass);
+        // fix: 解决bean名称有可能重复的问题
+        if (beanDefinitionMap.containsKey(beanDefinition.getName())) {
+            throw new RuntimeException("bean name is exists:" + beanDefinition.getName());
+        }
+        beanDefinitionMap.put(beanDefinition.getName(), beanDefinition);
+        return beanDefinition;
     }
 
     /**
