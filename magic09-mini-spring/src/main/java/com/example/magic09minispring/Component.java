@@ -14,6 +14,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Component {
 
-
+    /**
+     * bean name
+     * 默认值，如果类没有添加name属性，则使用类名作为beanName
+     * @return
+     */
+    String name() default "";
 
 }

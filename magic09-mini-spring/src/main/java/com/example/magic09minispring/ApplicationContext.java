@@ -9,27 +9,39 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 模拟Spring IoC 容器
  */
 public class ApplicationContext {
 
+    private Map<String/*对象的名字*/, Object/*对象的实例*/> ioc = new HashMap<>();
+
     public ApplicationContext(String packageName) throws Exception {
         initContext(packageName);
     }
 
     public Object getBean(String beanName) {
-        return null;
+        return ioc.get(beanName);
     }
 
     public <T> T getBean(Class<T> beanType) {
-        return null;
+        return this.ioc.values().stream()
+                .filter(bean -> beanType.isAssignableFrom(bean.getClass()))
+                .findAny()
+                .map(bean -> (T) bean)
+                .orElseThrow(null);
     }
 
     public <T> List<T> getBeans(Class<T> beanType) {
-        return null;
+        return this.ioc.values().stream()
+                .filter(bean -> beanType.isAssignableFrom(bean.getClass()))
+                .map(bean -> (T) bean)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -126,7 +138,25 @@ public class ApplicationContext {
      * @param beanDefinition
      */
     protected void createBean(BeanDefinition beanDefinition) {
+        if (ioc.containsKey(beanDefinition.getName())) {
+            return;
+        }
+        doCreateBean(beanDefinition);
+    }
 
+    /**
+     * 创建Bean的具体实现
+     *
+     * @param beanDefinition
+     */
+    private void doCreateBean(BeanDefinition beanDefinition) {
+        Object bean = null;
+        try {
+            bean = beanDefinition.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        ioc.put(beanDefinition.getName(), bean);
     }
 
 

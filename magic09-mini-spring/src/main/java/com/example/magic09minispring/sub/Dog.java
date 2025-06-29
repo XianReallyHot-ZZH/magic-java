@@ -2,6 +2,6 @@ package com.example.magic09minispring.sub;
 
 import com.example.magic09minispring.Component;
 
-@Component
-public class Cat {
+@Component(name = "mydog")
+public class Dog {
 }
