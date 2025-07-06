@@ -1,5 +1,7 @@
 package com.example.magic09minispring.web;
 
+import com.example.magic09minispring.Component;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

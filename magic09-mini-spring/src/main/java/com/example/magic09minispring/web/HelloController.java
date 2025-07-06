@@ -1,8 +1,11 @@
 package com.example.magic09minispring.web;
 
+import com.example.magic09minispring.Component;
+
 /**
  * controller demo
  */
+@Component
 @Controller
 @RequestMapping("/hello")
 public class HelloController {
@@ -13,7 +16,16 @@ public class HelloController {
      */
     @RequestMapping("/a")
     public String hello() {
-        return "hello";
+        return "hello xiao shuai";
     }
+
+//    /**
+//     * 测试相同uri的情况
+//     * @return
+//     */
+//    @RequestMapping("/a")
+//    public String hello1() {
+//        return "hello";
+//    }
 
 }
