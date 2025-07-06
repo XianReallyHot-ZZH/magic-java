@@ -3,6 +3,7 @@ package com.example.magic09minispring;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -24,6 +25,7 @@ public class ApplicationContext {
     private Map<String/*对象的名字*/, Object/*对象的实例*/> ioc = new HashMap<>();
     private Map<String/*对象的名字*/, Object/*还未完整加载完的实例对象*/> loadingIoc = new HashMap<>();
     private Map<String/*对象名字*/, BeanDefinition/*对象定义*/> beanDefinitionMap = new HashMap<>();
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     public ApplicationContext(String packageName) throws Exception {
         initContext(packageName);
@@ -84,7 +86,18 @@ public class ApplicationContext {
                 .filter(this::needCreate)
                 .map(this::wrapperBeanDefinition)
                 .toList();
+        initBeanPostProcessorScan();
         beanDefinitions.forEach(this::createBean);
+    }
+
+    /**
+     * 创建+初始化BeanPostProcessor
+     */
+    private void initBeanPostProcessorScan() {
+        beanDefinitionMap.values().stream()
+                .filter(bd -> BeanPostProcessor.class.isAssignableFrom(bd.getBeanType()))
+                .map(bd -> (BeanPostProcessor) createBean(bd))
+                .forEach(beanPostProcessors::add);
     }
 
     /**
@@ -188,16 +201,42 @@ public class ApplicationContext {
             loadingIoc.put(beanDefinition.getName(), bean);
             // 实现对成员变量的注入
             autowiredBean(bean, beanDefinition);
-            // 实现对@PostConstruct注解的方法调用
-            Method postConstructMethod = beanDefinition.getPostConstructMethod();
-            if (postConstructMethod != null) {
-                postConstructMethod.invoke(bean);
-            }
+            // 初始化bean
+            bean = initializeBean(bean, beanDefinition);
             // 走到这步，说明bean已经完整的完成实例化加载，可以从loadingIoc中取出放入真正的ioc容器中了
-            ioc.put(beanDefinition.getName(), loadingIoc.remove(beanDefinition.getName()));
+            loadingIoc.remove(beanDefinition.getName());
+            ioc.put(beanDefinition.getName(), bean);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return bean;
+    }
+
+    /**
+     * 初始化bean
+     *
+     * @param bean
+     * @param beanDefinition
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    private Object initializeBean(Object bean, BeanDefinition beanDefinition) throws InvocationTargetException, IllegalAccessException {
+        // 初始化bean之前，回调BeanPostProcessor的beforeInitializeBean方法
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            bean = beanPostProcessor.beforeInitializeBean(bean, beanDefinition.getName());
+        }
+
+        // 实现对@PostConstruct注解的方法调用
+        Method postConstructMethod = beanDefinition.getPostConstructMethod();
+        if (postConstructMethod != null) {
+            postConstructMethod.invoke(bean);
+        }
+
+        // 初始化bean之后，回调BeanPostProcessor的afterInitializeBean方法
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            bean = beanPostProcessor.afterInitializeBean(bean, beanDefinition.getName());
+        }
+
         return bean;
     }
 
