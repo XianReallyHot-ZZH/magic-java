@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class ApplicationContext {
 
     private Map<String/*对象的名字*/, Object/*对象的实例*/> ioc = new HashMap<>();
+    private Map<String/*对象的名字*/, Object/*还未完整加载完的实例对象*/> loadingIoc = new HashMap<>();
     private Map<String/*对象名字*/, BeanDefinition/*对象定义*/> beanDefinitionMap = new HashMap<>();
 
     public ApplicationContext(String packageName) throws Exception {
@@ -163,8 +164,13 @@ public class ApplicationContext {
      * @param beanDefinition
      */
     protected Object createBean(BeanDefinition beanDefinition) {
+        // 判断实例IOC容器中是否有这个对象
         if (ioc.containsKey(beanDefinition.getName())) {
             return ioc.get(beanDefinition.getName());
+        }
+        // 判断loadingIOC容器中，是否有这个对象
+        if (loadingIoc.containsKey(beanDefinition.getName())) {
+            return loadingIoc.get(beanDefinition.getName());
         }
         return doCreateBean(beanDefinition);
     }
@@ -178,6 +184,8 @@ public class ApplicationContext {
         Object bean = null;
         try {
             bean = beanDefinition.getConstructor().newInstance();
+            // 把自己放进loadingIoc中，因为这时候该bean还没有完全加载完
+            loadingIoc.put(beanDefinition.getName(), bean);
             // 实现对成员变量的注入
             autowiredBean(bean, beanDefinition);
             // 实现对@PostConstruct注解的方法调用
@@ -185,7 +193,8 @@ public class ApplicationContext {
             if (postConstructMethod != null) {
                 postConstructMethod.invoke(bean);
             }
-            ioc.put(beanDefinition.getName(), bean);
+            // 走到这步，说明bean已经完整的完成实例化加载，可以从loadingIoc中取出放入真正的ioc容器中了
+            ioc.put(beanDefinition.getName(), loadingIoc.remove(beanDefinition.getName()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
