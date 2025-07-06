@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +39,8 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
         }
         try {
             Object controllerBean = handler.getControllerBean();
-            Object result = handler.getMethod().invoke(controllerBean);
+            Object[] args = resolveArgs(req, handler.getMethod());
+            Object result = handler.getMethod().invoke(controllerBean, args);
             // 根据ResponseBody注解返回其对应类型的结果
             switch (handler.getResultType()) {
                 case HTML -> {
@@ -56,6 +59,37 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
             throw new ServletException(e);
         }
 
+    }
+
+    /**
+     * 根据方法入参去获取请求uri中的参数
+     * @param req
+     * @param method
+     * @return
+     */
+    private Object[] resolveArgs(HttpServletRequest req, Method method) {
+        Parameter[] parameters = method.getParameters();
+        Object[] args = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            Class<?> parameterType = parameter.getType();
+            // 获取参数上的PathParam注解，解析出参数名称
+            PathParam pathParam = parameter.getAnnotation(PathParam.class);
+            String value = pathParam != null ? req.getParameter(pathParam.value()) : req.getParameter(parameter.getName());
+            // 参数解析，数据类型转换，这里我们简单处理了，只支持String和Integer
+            if (value == null) {
+                args[i] = null;
+                continue;
+            }
+            if (String.class.isAssignableFrom(parameterType)) {
+                args[i] = value;
+            } else if (Integer.class.isAssignableFrom(parameterType)) {
+                args[i] = Integer.parseInt(value);
+            } else {
+                args[i] = null;
+            }
+        }
+        return args;
     }
 
     /**

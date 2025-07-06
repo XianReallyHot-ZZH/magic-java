@@ -19,6 +19,18 @@ public class HelloController {
         return "hello xiao shuai";
     }
 
+    /**
+     * 测试带入参的请求
+     *
+     * @param name
+     * @param age
+     * @return
+     */
+    @RequestMapping("/b")
+    public String helloB(@PathParam("name") String name, @PathParam("age") Integer age) {
+        return String.format("<h1>hello world</h1> <br> name:%s, age:%s", name, age);
+    }
+
 //    /**
 //     * 测试相同uri的情况
 //     * @return
