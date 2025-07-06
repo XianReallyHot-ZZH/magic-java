@@ -2,6 +2,7 @@ package com.example.magic09minispring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -28,20 +29,36 @@ public class ApplicationContext {
     }
 
     public Object getBean(String beanName) {
-        return ioc.get(beanName);
+        if (beanName == null) {
+            return null;
+        }
+        // ioc中已经有实例了，那么直接返回
+        Object bean = ioc.get(beanName);
+        if (bean !=  null) {
+            return bean;
+        }
+        // 还没创建，那么创建bean
+        if (beanDefinitionMap.containsKey(beanName)) {
+            return createBean(beanDefinitionMap.get(beanName));
+        }
+        // 走到这，说明beanName不存在
+        return null;
     }
 
     public <T> T getBean(Class<T> beanType) {
-        return this.ioc.values().stream()
-                .filter(bean -> beanType.isAssignableFrom(bean.getClass()))
-                .findAny()
-                .map(bean -> (T) bean)
-                .orElseThrow(null);
+        String beanName = this.beanDefinitionMap.values().stream()
+                .filter(beanDefinition -> beanType.isAssignableFrom(beanDefinition.getBeanType()))
+                .map(BeanDefinition::getName)
+                .findFirst()
+                .orElse(null);
+        return (T) getBean(beanName);
     }
 
     public <T> List<T> getBeans(Class<T> beanType) {
-        return this.ioc.values().stream()
-                .filter(bean -> beanType.isAssignableFrom(bean.getClass()))
+        return this.beanDefinitionMap.values().stream()
+                .filter(beanDefinition -> beanType.isAssignableFrom(beanDefinition.getBeanType()))
+                .map(BeanDefinition::getName)
+                .map(this::getBean)
                 .map(bean -> (T) bean)
                 .collect(Collectors.toList());
     }
@@ -145,11 +162,11 @@ public class ApplicationContext {
      *
      * @param beanDefinition
      */
-    protected void createBean(BeanDefinition beanDefinition) {
+    protected Object createBean(BeanDefinition beanDefinition) {
         if (ioc.containsKey(beanDefinition.getName())) {
-            return;
+            return ioc.get(beanDefinition.getName());
         }
-        doCreateBean(beanDefinition);
+        return doCreateBean(beanDefinition);
     }
 
     /**
@@ -157,10 +174,12 @@ public class ApplicationContext {
      *
      * @param beanDefinition
      */
-    private void doCreateBean(BeanDefinition beanDefinition) {
+    private Object doCreateBean(BeanDefinition beanDefinition) {
         Object bean = null;
         try {
             bean = beanDefinition.getConstructor().newInstance();
+            // 实现对成员变量的注入
+            autowiredBean(bean, beanDefinition);
             // 实现对@PostConstruct注解的方法调用
             Method postConstructMethod = beanDefinition.getPostConstructMethod();
             if (postConstructMethod != null) {
@@ -169,6 +188,21 @@ public class ApplicationContext {
             ioc.put(beanDefinition.getName(), bean);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        return bean;
+    }
+
+    /**
+     * 实现对bean的属性依赖自动注入
+     *
+     * @param bean
+     * @param beanDefinition
+     */
+    private void autowiredBean(Object bean, BeanDefinition beanDefinition) throws IllegalAccessException {
+        for (Field autowiredField : beanDefinition.getAutowiredFields()) {
+            autowiredField.setAccessible(true);
+            // 根据属性类型获取bean
+            autowiredField.set(bean, getBean(autowiredField.getType()));
         }
     }
 
