@@ -1,6 +1,10 @@
-package com.example.magic09minispring.web;
+package com.example.magic09minispring.web.demo;
 
 import com.example.magic09minispring.Component;
+import com.example.magic09minispring.web.Controller;
+import com.example.magic09minispring.web.PathParam;
+import com.example.magic09minispring.web.RequestMapping;
+import com.example.magic09minispring.web.ResponseBody;
 
 /**
  * controller demo
@@ -30,6 +34,16 @@ public class HelloController {
     public String helloB(@PathParam("name") String name, @PathParam("age") Integer age) {
         return String.format("<h1>hello world</h1> <br> name:%s, age:%s", name, age);
     }
+
+    @RequestMapping("/json")
+    @ResponseBody
+    public User json(@PathParam("name") String name, @PathParam("age") Integer age) {
+        User user = new User();
+        user.setName(name);
+        user.setAge(age);
+        return user;
+    }
+
 
 //    /**
 //     * 测试相同uri的情况

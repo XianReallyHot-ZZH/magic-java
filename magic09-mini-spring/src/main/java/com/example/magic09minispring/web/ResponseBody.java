@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 注解ResponseBody，表示返回值是什么类型
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ResponseBody {
     
