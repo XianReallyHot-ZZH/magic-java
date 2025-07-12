@@ -1,4 +1,4 @@
-package com.example.magic09minispring.web;
+package com.example.magic09minispring.web.demo;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
