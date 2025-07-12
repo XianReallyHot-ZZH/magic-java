@@ -1,10 +1,7 @@
 package com.example.magic09minispring.web.demo;
 
 import com.example.magic09minispring.Component;
-import com.example.magic09minispring.web.Controller;
-import com.example.magic09minispring.web.PathParam;
-import com.example.magic09minispring.web.RequestMapping;
-import com.example.magic09minispring.web.ResponseBody;
+import com.example.magic09minispring.web.*;
 
 /**
  * controller demo
@@ -35,6 +32,13 @@ public class HelloController {
         return String.format("<h1>hello world</h1> <br> name:%s, age:%s", name, age);
     }
 
+    /**
+     * 测试返回json
+     *
+     * @param name
+     * @param age
+     * @return
+     */
     @RequestMapping("/json")
     @ResponseBody
     public User json(@PathParam("name") String name, @PathParam("age") Integer age) {
@@ -42,6 +46,14 @@ public class HelloController {
         user.setName(name);
         user.setAge(age);
         return user;
+    }
+
+
+    @RequestMapping("/local")
+    public ModelAndView local(@PathParam("name") String name, @PathParam("age") Integer age) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setView("index.html");
+        return modelAndView;
     }
 
 

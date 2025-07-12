@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
             // 根据ResponseBody注解返回其对应类型的结果
             switch (handler.getResultType()) {
                 case HTML -> {
-                    res.setContentType("text/html");
+                    res.setContentType("text/html;charset=UTF-8");
                     res.getWriter().write(result.toString());
                 }
                 case JSON -> {
@@ -52,7 +53,11 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
                     res.getWriter().write(JSONObject.toJSONString(result));
                 }
                 case LOCAL -> {
-
+                    try (InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(((ModelAndView) result).getView())) {
+                        String htmlResource = new String(resourceAsStream.readAllBytes());
+                        res.setContentType("text/html;charset=UTF-8");
+                        res.getWriter().write(htmlResource);
+                    }
                 }
             }
         } catch (Exception e) {
