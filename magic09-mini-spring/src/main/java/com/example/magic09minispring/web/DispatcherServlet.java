@@ -15,12 +15,15 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * 核心类DispatcherServlet，请求分发器
  */
 @Component
 public class DispatcherServlet extends HttpServlet implements BeanPostProcessor {
+
+    private static final Pattern PATTERN = Pattern.compile("shuaishuaizi\\{(.*?)}");
 
     private Map<String/*请求的uri*/, WebHandler/*请求对应的处理器*/> handlerMap = new HashMap<>();
 
@@ -55,6 +58,7 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
                 case LOCAL -> {
                     try (InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(((ModelAndView) result).getView())) {
                         String htmlResource = new String(resourceAsStream.readAllBytes());
+                        htmlResource = renderTemplate(htmlResource, ((ModelAndView) result).getContext());
                         res.setContentType("text/html;charset=UTF-8");
                         res.getWriter().write(htmlResource);
                     }
@@ -64,6 +68,20 @@ public class DispatcherServlet extends HttpServlet implements BeanPostProcessor 
             throw new ServletException(e);
         }
 
+    }
+
+    /**
+     * 根据上下文，对静态资源html模板进行渲染
+     *
+     * @param htmlResource
+     * @param context
+     * @return
+     */
+    private String renderTemplate(String htmlResource, Map<String, String> context) {
+        return PATTERN.matcher(htmlResource).replaceAll(matchResult -> {
+            String key = matchResult.group(1);
+            return context.getOrDefault(key, "");
+        });
     }
 
     /**

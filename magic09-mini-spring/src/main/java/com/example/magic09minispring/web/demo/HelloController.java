@@ -53,6 +53,7 @@ public class HelloController {
     public ModelAndView local(@PathParam("name") String name, @PathParam("age") Integer age) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setView("index.html");
+        modelAndView.getContext().put("name", name);
         return modelAndView;
     }
 
