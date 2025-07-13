@@ -25,6 +25,7 @@
         <module>magic07-pattern-chain</module>
         <module>magic08-pattern-flyweight</module>
         <module>magic09-mini-spring</module>
+        <module>magic10-mini-dynamicproxy</module>
     </modules>
 
     <dependencies>
