@@ -3,6 +3,7 @@ package com.example.magic10minidynamicproxy;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Compiler {
     public static void compile(File javaFile) {
 
         // 获取编译器
-        JavaCompiler compiler = javax.tools.ToolProvider.getSystemJavaCompiler();
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         // 获取java文件管理器
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
@@ -30,7 +31,7 @@ public class Compiler {
             Iterable<? extends JavaFileObject> compilableUnits = fileManager.getJavaFileObjectsFromFiles(List.of(javaFile));
 
             // 设置编译选项
-            List<String> options = List.of("-d", "./target/classes");   // 指定编译后的目录,编译出的class文件存放在target/classes目录下
+            List<String> options = List.of("-d", "./target/classes");   // 指定编译后的目录,编译出的class文件存放在target/classes目录下（classpath文件路径下）
 
             // 创建编译任务
             JavaCompiler.CompilationTask task = compiler.getTask(
@@ -50,7 +51,7 @@ public class Compiler {
                 System.out.println("编译失败");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
