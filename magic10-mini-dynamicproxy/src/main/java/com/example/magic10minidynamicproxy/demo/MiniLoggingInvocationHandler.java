@@ -1,12 +1,13 @@
 package com.example.magic10minidynamicproxy.demo;
 
-import java.lang.reflect.InvocationHandler;
+import com.example.magic10minidynamicproxy.MiniInvocationHandler;
+
 import java.lang.reflect.Method;
 
-public class LoggingInvocationHandler implements InvocationHandler {
+public class MiniLoggingInvocationHandler implements MiniInvocationHandler {
     private final Object target;
 
-    public LoggingInvocationHandler(Object target) {
+    public MiniLoggingInvocationHandler(Object target) {
         this.target = target;
     }
 

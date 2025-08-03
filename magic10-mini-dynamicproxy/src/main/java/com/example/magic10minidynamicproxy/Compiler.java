@@ -30,8 +30,18 @@ public class Compiler {
 //            Iterable<? extends JavaFileObject> compilableUnits = fileManager.getJavaFileObjects(javaFile);
             Iterable<? extends JavaFileObject> compilableUnits = fileManager.getJavaFileObjectsFromFiles(List.of(javaFile));
 
-            // 设置编译选项
-            List<String> options = List.of("-d", "./target/classes");   // 指定编译后的目录,编译出的class文件存放在target/classes目录下（classpath文件路径下）
+            // 获取项目的类路径
+//            String classpath = System.getProperty("java.class.path");
+
+            // 获取项目根目录的绝对路径（由于是父子项目，需要手动添加子项目的编译结果路径到classpath下，不然会报找不到类），如果是正常的项目，这里不需要手动添加
+            String projectDir = System.getProperty("user.dir") + File.separator + "magic10-mini-dynamicproxy";
+            String targetClassesPath = projectDir + File.separator + "target" + File.separator + "classes";
+
+            // 添加当前项目路径到类路径
+            List<String> options = List.of(
+                    "-d", targetClassesPath,            // 编译结果文件存放路径
+                    "-cp", targetClassesPath       // 扫描类路径
+            );
 
             // 创建编译任务
             JavaCompiler.CompilationTask task = compiler.getTask(
